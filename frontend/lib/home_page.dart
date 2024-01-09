@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/calendar.dart';
 import 'package:frontend/calendar_link.dart';
+import 'package:frontend/create_calendar_screen.dart';
 
 class HomePage extends StatelessWidget {
   @override
@@ -19,7 +20,8 @@ class HomePage extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Calendar()),
+                  MaterialPageRoute(
+                      builder: (context) => CreateCalendarScreen()),
                 );
               },
             ),
