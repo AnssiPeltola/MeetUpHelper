@@ -1,0 +1,28 @@
+databaseType = "PostgreSql"
+id = "83905774-8b41-4870-b32c-19d790965ba1"
+name = "Flyway"
+
+[flyway]
+locations = [ "filesystem:migrations" ]
+mixed = true
+outOfOrder = true
+schemaModelLocation = "schema-model"
+validateMigrationNaming = true
+
+  [flyway.check]
+  majorTolerance = 0
+
+[flywayDesktop]
+developmentEnvironment = "development"
+schemaModel = "schema-model"
+shadowEnvironment = "shadow"
+
+[redgateCompare]
+filterFile = "filter.rgf"
+
+[redgateCompare.postgresql.options.ignores]
+ignoreNewlinesInTextObjects = "off"
+
+[environments.anssi]
+url = "jdbc:postgresql://localhost:5432/meetuphelper"
+schemas = [ "public" ]

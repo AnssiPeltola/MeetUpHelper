@@ -74,3 +74,12 @@ package-lock.json
 *.tmp
 *~
 *.out
+
+# Environment variables
+*.env
+
+# Flyway
+flyway.conf
+
+# Own files
+muistio.txt
