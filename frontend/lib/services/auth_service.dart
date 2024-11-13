@@ -20,7 +20,8 @@ class AuthService {
     return response.statusCode == 201;
   }
 
-  Future<String?> loginUser(String username, String password) async {
+  Future<Map<String, String>?> loginUser(
+      String username, String password) async {
     final response = await http.post(
       Uri.parse('$baseUrl/accounts/login/'),
       body: {
@@ -31,7 +32,10 @@ class AuthService {
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-      return data['access']; // Return the JWT token
+      return {
+        'username': username,
+        'token': data['access'],
+      }; // Return the username and JWT token
     } else {
       return null;
     }
