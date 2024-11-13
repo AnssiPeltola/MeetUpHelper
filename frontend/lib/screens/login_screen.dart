@@ -13,18 +13,23 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
 
   Future<void> _login() async {
-    String? token = await _authService.loginUser(
+    final result = await _authService.loginUser(
       _usernameController.text,
       _passwordController.text,
     );
 
-    if (token != null) {
+    if (result != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Login successful!')),
       );
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => LoggedInScreen(token: token)),
+        MaterialPageRoute(
+          builder: (context) => LoggedInScreen(
+            username: result['username']!,
+            token: result['token']!,
+          ),
+        ),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
