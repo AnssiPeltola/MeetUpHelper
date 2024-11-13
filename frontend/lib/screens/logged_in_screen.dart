@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'calendar_screen.dart';
+import 'group_screen.dart';
 
 class LoggedInScreen extends StatelessWidget {
   final String username;
@@ -11,13 +11,13 @@ class LoggedInScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Navigate to the calendar screen after 3 seconds with a fade transition
+    // Navigate to the group screen after 3 seconds with a fade transition
     Timer(Duration(seconds: 3), () {
       Navigator.pushReplacement(
         context,
         PageRouteBuilder(
           pageBuilder: (context, animation, secondaryAnimation) =>
-              CalendarScreen(),
+              GroupScreen(token: token),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             return FadeTransition(
               opacity: animation,
