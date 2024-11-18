@@ -28,12 +28,15 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
     try {
       final fetchedGroup =
           await _groupService.fetchGroupDetails(widget.token, widget.groupId);
+      debugPrint('Fetched group details: $fetchedGroup'); // Add logging here
       setState(() {
         group = fetchedGroup;
         events = fetchedGroup['events'] ?? [];
+        debugPrint('Fetched events: $events'); // Add logging here
       });
     } catch (e) {
       // Handle error
+      debugPrint('Error fetching group details: $e');
     }
   }
 

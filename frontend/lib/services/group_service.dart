@@ -102,4 +102,84 @@ class GroupService {
       return false;
     }
   }
+
+  Future<bool> inviteUser(String token, int groupId, String email) async {
+    final url = Uri.parse('$baseUrl/groups/invite/');
+    debugPrint(
+        'Sending POST request to $url with data: {group_id: $groupId, email: $email}');
+    final response = await http.post(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({
+        'group_id': groupId,
+        'email': email,
+      }),
+    );
+
+    if (response.statusCode == 201) {
+      debugPrint('User invited successfully');
+      return true;
+    } else {
+      debugPrint('Failed to invite user: ${response.body}');
+      return false;
+    }
+  }
+
+  Future<List<dynamic>> fetchInvitations(String token) async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/groups/invitations/'),
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to load invitations');
+    }
+  }
+
+  Future<bool> acceptInvitation(String token, int invitationId) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/groups/invite/accept/'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({
+        'invitation_id': invitationId,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      debugPrint('Failed to accept invitation: ${response.body}');
+      return false;
+    }
+  }
+
+  Future<bool> rejectInvitation(String token, int invitationId) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/groups/invite/reject/'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({
+        'invitation_id': invitationId,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      debugPrint('Failed to reject invitation: ${response.body}');
+      return false;
+    }
+  }
 }

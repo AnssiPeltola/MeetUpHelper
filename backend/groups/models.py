@@ -28,3 +28,12 @@ class Event(models.Model):
 
     def __str__(self):
         return self.title
+    
+class GroupInvitation(models.Model):
+    group = models.ForeignKey(Group, related_name='invitations', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='invitations', on_delete=models.CASCADE)
+    invited_at = models.DateTimeField(auto_now_add=True)
+    accepted = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ('user', 'group')
