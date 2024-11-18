@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import '../services/group_service.dart';
+import 'create_event_screen.dart';
 
 class GroupDetailScreen extends StatefulWidget {
   final String token;
@@ -27,14 +28,11 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
     try {
       final fetchedGroup =
           await _groupService.fetchGroupDetails(widget.token, widget.groupId);
-      print('Fetched group: $fetchedGroup'); // Debugging statement
       setState(() {
         group = fetchedGroup;
-        events = fetchedGroup['events'] ?? []; // Handle missing events
-        print('Fetched events: $events'); // Debugging statement
+        events = fetchedGroup['events'] ?? [];
       });
     } catch (e) {
-      print('Error fetching group details: $e'); // Debugging statement
       // Handle error
     }
   }
@@ -42,7 +40,25 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(group?['name'] ?? 'Group Details')),
+      appBar: AppBar(
+        title: Text(group?['name'] ?? 'Group Details'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.add),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CreateEventScreen(
+                    token: widget.token,
+                    groupId: widget.groupId,
+                  ),
+                ),
+              ).then((_) => fetchGroupDetails());
+            },
+          ),
+        ],
+      ),
       body: group == null
           ? Center(child: CircularProgressIndicator())
           : Column(

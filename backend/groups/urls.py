@@ -2,7 +2,7 @@ from django.urls import path
 from .views import (
     GroupListCreateView, GroupDetailView,
     GroupMembershipListCreateView, GroupMembershipDetailView,
-    EventListCreateView, EventDetailView
+    EventListCreateView, EventDetailView, EventCreateView
 )
 
 urlpatterns = [
@@ -12,4 +12,5 @@ urlpatterns = [
     path('memberships/<int:pk>/', GroupMembershipDetailView.as_view(), name='membership-detail'),
     path('events/', EventListCreateView.as_view(), name='event-list-create'),
     path('events/<int:pk>/', EventDetailView.as_view(), name='event-detail'),
+    path('events/create/', EventCreateView.as_view(), name='event-create'),
 ]

@@ -3,6 +3,8 @@ import '../services/auth_service.dart';
 import 'logged_in_screen.dart';
 
 class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
@@ -20,7 +22,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (result != null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Login successful!')),
+        const SnackBar(content: Text('Login successful!')),
       );
       Navigator.pushReplacement(
         context,
@@ -33,7 +35,7 @@ class _LoginScreenState extends State<LoginScreen> {
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Login failed.')),
+        const SnackBar(content: Text('Login failed.')),
       );
     }
   }
@@ -41,24 +43,24 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Login')),
+      appBar: AppBar(title: const Text('Login')),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             TextField(
               controller: _usernameController,
-              decoration: InputDecoration(labelText: 'Username'),
+              decoration: const InputDecoration(labelText: 'Username'),
             ),
             TextField(
               controller: _passwordController,
-              decoration: InputDecoration(labelText: 'Password'),
+              decoration: const InputDecoration(labelText: 'Password'),
               obscureText: true,
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: _login,
-              child: Text('Login'),
+              child: const Text('Login'),
             ),
           ],
         ),

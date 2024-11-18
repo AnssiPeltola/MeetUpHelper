@@ -6,7 +6,7 @@ import 'create_group_screen.dart';
 class GroupScreen extends StatefulWidget {
   final String token;
 
-  GroupScreen({required this.token});
+  const GroupScreen({super.key, required this.token});
 
   @override
   _GroupScreenState createState() => _GroupScreenState();
@@ -37,10 +37,10 @@ class _GroupScreenState extends State<GroupScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Groups'),
+        title: const Text('Groups'),
         actions: [
           IconButton(
-            icon: Icon(Icons.add),
+            icon: const Icon(Icons.add),
             onPressed: () {
               Navigator.push(
                 context,

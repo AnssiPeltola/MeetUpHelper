@@ -1,6 +1,7 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter/foundation.dart';
 
 class GroupService {
   final String baseUrl = dotenv.env['BASE_URL']!;
@@ -75,8 +76,11 @@ class GroupService {
 
   Future<bool> createEvent(String token, int groupId, String title,
       String description, DateTime startTime, DateTime endTime) async {
+    final url = Uri.parse('$baseUrl/groups/events/create/');
+    debugPrint(
+        'Sending POST request to $url with data: {group: $groupId, title: $title, description: $description, start_time: ${startTime.toIso8601String()}, end_time: ${endTime.toIso8601String()}}');
     final response = await http.post(
-      Uri.parse('$baseUrl/events/'),
+      url,
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
@@ -91,9 +95,10 @@ class GroupService {
     );
 
     if (response.statusCode == 201) {
+      debugPrint('Event created successfully');
       return true;
     } else {
-      print('Failed to create event: ${response.body}');
+      debugPrint('Failed to create event: ${response.body}');
       return false;
     }
   }
