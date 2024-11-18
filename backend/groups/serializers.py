@@ -18,6 +18,9 @@ class EventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
         fields = '__all__'
+        extra_kwargs = {
+            'created_by': {'read_only': True},
+        }
 
 class GroupSerializer(serializers.ModelSerializer):
     events = EventSerializer(many=True, read_only=True)

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 class CalendarScreen extends StatelessWidget {
+  const CalendarScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -9,7 +11,7 @@ class CalendarScreen extends StatelessWidget {
       body: SfCalendar(
         view: CalendarView.month,
         dataSource: MeetingDataSource(_getDataSource()),
-        monthViewSettings: MonthViewSettings(
+        monthViewSettings: const MonthViewSettings(
           appointmentDisplayMode: MonthAppointmentDisplayMode.appointment,
         ),
       ),

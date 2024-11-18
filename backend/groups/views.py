@@ -4,6 +4,9 @@ from django.db import models
 from .serializers import GroupSerializer, GroupMembershipSerializer, EventSerializer
 from rest_framework.response import Response
 from rest_framework import status
+import logging
+
+logger = logging.getLogger(__name__)
 
 class GroupListCreateView(generics.ListCreateAPIView):
     serializer_class = GroupSerializer
@@ -40,3 +43,11 @@ class EventListCreateView(generics.ListCreateAPIView):
 class EventDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
+
+class EventCreateView(generics.CreateAPIView):
+    queryset = Event.objects.all()
+    serializer_class = EventSerializer
+
+    def perform_create(self, serializer):
+        logger.debug(f"Creating event with data: {serializer.validated_data}")
+        serializer.save(created_by=self.request.user)

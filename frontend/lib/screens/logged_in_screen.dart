@@ -12,7 +12,7 @@ class LoggedInScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Navigate to the group screen after 3 seconds with a fade transition
-    Timer(Duration(seconds: 3), () {
+    Timer(const Duration(seconds: 3), () {
       Navigator.pushReplacement(
         context,
         PageRouteBuilder(
@@ -38,22 +38,22 @@ class LoggedInScreen extends StatelessWidget {
             children: [
               Text(
                 'Welcome $username!',
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(height: 20),
-              Text(
+              const SizedBox(height: 20),
+              const Text(
                 'Your token is:',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Container(
-                padding: EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(8.0),
                 decoration: BoxDecoration(
                   color: Colors.grey[200],
                   borderRadius: BorderRadius.circular(8.0),
@@ -61,7 +61,7 @@ class LoggedInScreen extends StatelessWidget {
                 child: Text(
                   token,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 16,
                     fontFamily: 'Courier',
                   ),
