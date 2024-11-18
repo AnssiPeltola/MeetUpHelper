@@ -2,7 +2,7 @@ from django.urls import path
 from .views import (
     GroupListCreateView, GroupDetailView,
     GroupMembershipListCreateView, GroupMembershipDetailView,
-    EventListCreateView, EventDetailView, EventCreateView
+    EventListCreateView, EventDetailView, EventCreateView, InviteUserView, AcceptInvitationView, RejectInvitationView, ListInvitationsView
 )
 
 urlpatterns = [
@@ -13,4 +13,8 @@ urlpatterns = [
     path('events/', EventListCreateView.as_view(), name='event-list-create'),
     path('events/<int:pk>/', EventDetailView.as_view(), name='event-detail'),
     path('events/create/', EventCreateView.as_view(), name='event-create'),
+    path('invite/', InviteUserView.as_view(), name='invite-user'),
+    path('invite/accept/', AcceptInvitationView.as_view(), name='accept-invitation'),
+    path('invite/reject/', RejectInvitationView.as_view(), name='reject-invitation'),
+    path('invitations/', ListInvitationsView.as_view(), name='list-invitations'),
 ]

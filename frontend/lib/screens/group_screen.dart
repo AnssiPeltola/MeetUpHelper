@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../services/group_service.dart';
 import 'group_detail_screen.dart';
 import 'create_group_screen.dart';
+import 'group_settings_screen.dart';
+import 'invitations_screen.dart';
 
 class GroupScreen extends StatefulWidget {
   final String token;
@@ -50,6 +52,17 @@ class _GroupScreenState extends State<GroupScreen> {
               ).then((_) => fetchGroups());
             },
           ),
+          IconButton(
+            icon: const Icon(Icons.mail),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => InvitationsScreen(token: widget.token),
+                ),
+              );
+            },
+          ),
         ],
       ),
       body: ListView.builder(
@@ -57,6 +70,20 @@ class _GroupScreenState extends State<GroupScreen> {
         itemBuilder: (context, index) {
           return ListTile(
             title: Text(groups[index]['name']),
+            trailing: IconButton(
+              icon: Icon(Icons.settings),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => GroupSettingsScreen(
+                      token: widget.token,
+                      groupId: groups[index]['id'],
+                    ),
+                  ),
+                );
+              },
+            ),
             onTap: () {
               Navigator.push(
                 context,
