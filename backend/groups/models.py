@@ -11,9 +11,14 @@ class Group(models.Model):
         return self.name
 
 class GroupMembership(models.Model):
+    ROLE_CHOICES = [
+        ('admin', 'Admin'),
+        ('member', 'Member'),
+    ]
     user = models.ForeignKey(User, related_name='memberships', on_delete=models.CASCADE)
     group = models.ForeignKey(Group, related_name='memberships', on_delete=models.CASCADE)
     joined_at = models.DateTimeField(auto_now_add=True)
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='member')
 
     class Meta:
         unique_together = ('user', 'group')
@@ -28,7 +33,7 @@ class Event(models.Model):
 
     def __str__(self):
         return self.title
-    
+
 class GroupInvitation(models.Model):
     group = models.ForeignKey(Group, related_name='invitations', on_delete=models.CASCADE)
     user = models.ForeignKey(User, related_name='invitations', on_delete=models.CASCADE)

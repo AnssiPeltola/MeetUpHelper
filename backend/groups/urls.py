@@ -1,8 +1,8 @@
 from django.urls import path
 from .views import (
-    GroupListCreateView, GroupDetailView,
+    GroupListCreateView, GroupDetailView, GroupMembersView,
     GroupMembershipListCreateView, GroupMembershipDetailView,
-    EventListCreateView, EventDetailView, EventCreateView, InviteUserView, AcceptInvitationView, RejectInvitationView, ListInvitationsView
+    EventListCreateView, EventDetailView, EventCreateView, InviteUserView, AcceptInvitationView, KickUserView, RejectInvitationView, ListInvitationsView
 )
 
 urlpatterns = [
@@ -17,4 +17,6 @@ urlpatterns = [
     path('invite/accept/', AcceptInvitationView.as_view(), name='accept-invitation'),
     path('invite/reject/', RejectInvitationView.as_view(), name='reject-invitation'),
     path('invitations/', ListInvitationsView.as_view(), name='list-invitations'),
+    path('kick/<int:pk>/', KickUserView.as_view(), name='kick-user'),
+    path('<int:pk>/members/', GroupMembersView.as_view(), name='group-members'),
 ]

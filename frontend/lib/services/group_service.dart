@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 
 class GroupService {
   final String baseUrl = dotenv.env['BASE_URL']!;
+  int? currentUserId;
 
   Future<List<dynamic>> fetchGroups(String token) async {
     final response = await http.get(
@@ -45,17 +46,38 @@ class GroupService {
 
   Future<Map<String, dynamic>> fetchGroupDetails(
       String token, int groupId) async {
+    final url = Uri.parse('$baseUrl/groups/$groupId/');
     final response = await http.get(
-      Uri.parse('$baseUrl/groups/$groupId/'),
+      url,
       headers: {
         'Authorization': 'Bearer $token',
       },
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body);
+      final groupData = json.decode(response.body);
+      debugPrint('Fetched group data: $groupData'); // Add logging here
+      return groupData;
     } else {
       throw Exception('Failed to load group details');
+    }
+  }
+
+  Future<List<dynamic>> fetchGroupMembers(String token, int groupId) async {
+    final url = Uri.parse('$baseUrl/groups/$groupId/members/');
+    final response = await http.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final membersData = json.decode(response.body);
+      debugPrint('Fetched group members: $membersData'); // Add logging here
+      return membersData;
+    } else {
+      throw Exception('Failed to load group members');
     }
   }
 
@@ -180,6 +202,43 @@ class GroupService {
     } else {
       debugPrint('Failed to reject invitation: ${response.body}');
       return false;
+    }
+  }
+
+  Future<bool> kickUser(String token, int membershipId) async {
+    final url = Uri.parse('$baseUrl/groups/kick/$membershipId/');
+    final response = await http.delete(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      debugPrint('User kicked successfully');
+      return true;
+    } else {
+      debugPrint('Failed to kick user: ${response.body}');
+      return false;
+    }
+  }
+
+  Future<void> fetchCurrentUser(String token) async {
+    final url = Uri.parse('$baseUrl/accounts/me/');
+    final response = await http.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final userData = json.decode(response.body);
+      debugPrint('Fetched current user data: $userData'); // Add logging here
+      currentUserId = userData['id'];
+      debugPrint('Current user ID: $currentUserId');
+    } else {
+      throw Exception('Failed to load current user details');
     }
   }
 }
