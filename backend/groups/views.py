@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from .serializers import GroupSerializer, GroupMembershipSerializer, EventSerializer, GroupInvitationSerializer
 from rest_framework.response import Response
 import logging
+from rest_framework.permissions import IsAuthenticated
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +20,8 @@ class GroupListCreateView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         try:
-            serializer.save(created_by=self.request.user)
+            group = serializer.save(created_by=self.request.user)
+            GroupMembership.objects.create(user=self.request.user, group=group, role='admin')
         except Exception as e:
             print(f"Error creating group: {e}")
             raise
@@ -32,6 +34,24 @@ class GroupDetailView(generics.RetrieveUpdateDestroyAPIView):
         group = self.get_object()
         serializer = self.get_serializer(group)
         return Response(serializer.data)
+
+    def delete(self, request, *args, **kwargs):
+        group = self.get_object()
+        if group.created_by != request.user:
+            return Response({'error': 'Only the group admin can delete the group.'}, status=status.HTTP_403_FORBIDDEN)
+        return super().delete(request, *args, **kwargs)
+    
+class KickUserView(generics.DestroyAPIView):
+    queryset = GroupMembership.objects.all()
+    serializer_class = GroupMembershipSerializer
+
+    def delete(self, request, *args, **kwargs):
+        membership = self.get_object()
+        group = membership.group
+        if group.created_by != request.user:
+            return Response({'error': 'Only the group admin can kick users.'}, status=status.HTTP_403_FORBIDDEN)
+        membership.delete()
+        return Response({'message': 'User kicked from group.'}, status=status.HTTP_200_OK)
 
 class GroupMembershipListCreateView(generics.ListCreateAPIView):
     queryset = GroupMembership.objects.all()
@@ -67,6 +87,8 @@ class InviteUserView(generics.CreateAPIView):
         try:
             group = Group.objects.get(id=group_id)
             user = User.objects.get(email=email)
+            if GroupMembership.objects.filter(user=user, group=group).exists():
+                return Response({'error': 'User is already a member of the group'}, status=status.HTTP_400_BAD_REQUEST)
             invitation, created = GroupInvitation.objects.get_or_create(user=user, group=group)
             if not created:
                 return Response({'error': 'User already invited'}, status=status.HTTP_400_BAD_REQUEST)
@@ -90,13 +112,14 @@ class AcceptInvitationView(generics.UpdateAPIView):
             invitation.accepted = True
             invitation.save()
             GroupMembership.objects.create(user=invitation.user, group=invitation.group)
+            invitation.delete()
             return Response({'message': 'Invitation accepted'}, status=status.HTTP_200_OK)
         except GroupInvitation.DoesNotExist:
             return Response({'error': 'Invitation not found'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-class RejectInvitationView(generics.DestroyAPIView):
+class RejectInvitationView(generics.UpdateAPIView):
     queryset = GroupInvitation.objects.all()
     serializer_class = GroupInvitationSerializer
 
@@ -118,3 +141,11 @@ class ListInvitationsView(generics.ListAPIView):
     def get_queryset(self):
         user = self.request.user
         return GroupInvitation.objects.filter(user=user)
+    
+class GroupMembersView(generics.ListAPIView):
+    serializer_class = GroupMembershipSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        group_id = self.kwargs['pk']
+        return GroupMembership.objects.filter(group_id=group_id)
