@@ -259,4 +259,21 @@ class GroupService {
       return false;
     }
   }
+
+  Future<int> fetchNewInvitationsCount(String token) async {
+    final url = Uri.parse('$baseUrl/groups/invitations/count/');
+    final response = await http.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      return data['new_invitations_count'];
+    } else {
+      throw Exception('Failed to load new invitations count');
+    }
+  }
 }

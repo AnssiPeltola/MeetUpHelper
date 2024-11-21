@@ -6,6 +6,7 @@ from .serializers import GroupSerializer, GroupMembershipSerializer, EventSerial
 from rest_framework.response import Response
 import logging
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
 
 logger = logging.getLogger(__name__)
 
@@ -154,3 +155,11 @@ class GroupMembersView(generics.ListAPIView):
     def get_queryset(self):
         group_id = self.kwargs['pk']
         return GroupMembership.objects.filter(group_id=group_id)
+    
+class NewInvitationsCountView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        new_invitations_count = GroupInvitation.objects.filter(user=user, accepted=False).count()
+        return Response({'new_invitations_count': new_invitations_count})
