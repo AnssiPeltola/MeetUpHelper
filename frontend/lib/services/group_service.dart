@@ -241,4 +241,22 @@ class GroupService {
       throw Exception('Failed to load current user details');
     }
   }
+
+  Future<bool> deleteGroup(String token, int groupId) async {
+    final url = Uri.parse('$baseUrl/groups/$groupId/delete/');
+    final response = await http.delete(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 204) {
+      debugPrint('Group deleted successfully');
+      return true;
+    } else {
+      debugPrint('Failed to delete group: ${response.body}');
+      return false;
+    }
+  }
 }

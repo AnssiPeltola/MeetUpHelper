@@ -34,12 +34,17 @@ class GroupDetailView(generics.RetrieveUpdateDestroyAPIView):
         group = self.get_object()
         serializer = self.get_serializer(group)
         return Response(serializer.data)
+    
+class DeleteGroupView(generics.DestroyAPIView):
+    queryset = Group.objects.all()
+    serializer_class = GroupSerializer
 
     def delete(self, request, *args, **kwargs):
         group = self.get_object()
         if group.created_by != request.user:
             return Response({'error': 'Only the group admin can delete the group.'}, status=status.HTTP_403_FORBIDDEN)
-        return super().delete(request, *args, **kwargs)
+        group.delete()
+        return Response({'message': 'Group deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
     
 class KickUserView(generics.DestroyAPIView):
     queryset = GroupMembership.objects.all()
