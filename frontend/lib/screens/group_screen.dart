@@ -54,13 +54,16 @@ class _GroupScreenState extends State<GroupScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.mail),
-            onPressed: () {
-              Navigator.push(
+            onPressed: () async {
+              final result = await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => InvitationsScreen(token: widget.token),
                 ),
               );
+              if (result == true) {
+                fetchGroups();
+              }
             },
           ),
         ],
@@ -71,7 +74,7 @@ class _GroupScreenState extends State<GroupScreen> {
           return ListTile(
             title: Text(groups[index]['name']),
             trailing: IconButton(
-              icon: Icon(Icons.settings),
+              icon: const Icon(Icons.settings),
               onPressed: () {
                 Navigator.push(
                   context,
