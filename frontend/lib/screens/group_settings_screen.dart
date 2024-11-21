@@ -6,7 +6,8 @@ class GroupSettingsScreen extends StatefulWidget {
   final int groupId;
 
   const GroupSettingsScreen(
-      {super.key, required this.token, required this.groupId});
+      {Key? key, required this.token, required this.groupId})
+      : super(key: key);
 
   @override
   _GroupSettingsScreenState createState() => _GroupSettingsScreenState();
@@ -53,15 +54,15 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
       final success = await _groupService.inviteUser(
           widget.token, widget.groupId, _emailController.text);
       if (success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('User invited successfully')));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('User invited successfully')));
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Failed to invite user')));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Failed to invite user')));
       }
     } catch (e) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('An error occurred')));
+          .showSnackBar(SnackBar(content: Text('An error occurred')));
     }
   }
 
@@ -70,16 +71,62 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
       final success = await _groupService.kickUser(widget.token, membershipId);
       if (success) {
         fetchGroupDetails();
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('User kicked successfully')));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('User kicked successfully')));
       } else {
         ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text('Failed to kick user')));
+            .showSnackBar(SnackBar(content: Text('Failed to kick user')));
       }
     } catch (e) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('An error occurred')));
+          .showSnackBar(SnackBar(content: Text('An error occurred')));
     }
+  }
+
+  Future<void> _deleteGroup() async {
+    try {
+      final success =
+          await _groupService.deleteGroup(widget.token, widget.groupId);
+      if (success) {
+        Navigator.of(context).pop(true);
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Group deleted successfully')));
+      } else {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Failed to delete group')));
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('An error occurred')));
+    }
+  }
+
+  void _showDeleteGroupDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Delete Group'),
+          content: Text(
+              'Are you sure you want to delete this group? This action cannot be undone.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _deleteGroup();
+              },
+              child: Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _showKickUserDialog() async {
@@ -91,8 +138,8 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Kick User from Group'),
-          content: SizedBox(
+          title: Text('Kick User from Group'),
+          content: Container(
             width: double.maxFinite,
             child: ListView.builder(
               shrinkWrap: true,
@@ -102,7 +149,7 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
                 return ListTile(
                   title: Text(member['user']['username']),
                   trailing: IconButton(
-                    icon: const Icon(Icons.remove_circle),
+                    icon: Icon(Icons.remove_circle),
                     onPressed: () {
                       Navigator.of(context).pop();
                       _confirmKickUser(
@@ -118,7 +165,7 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('Close'),
+              child: Text('Close'),
             ),
           ],
         );
@@ -131,7 +178,7 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Confirm Kick User'),
+          title: Text('Confirm Kick User'),
           content:
               Text('Are you sure you want to kick $username from the group?'),
           actions: [
@@ -139,14 +186,14 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('Cancel'),
+              child: Text('Cancel'),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
                 _kickUser(membershipId);
               },
-              child: const Text('Kick'),
+              child: Text('Kick'),
             ),
           ],
         );
@@ -159,36 +206,34 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
     final isAdmin = group?['created_by']['id'] == _groupService.currentUserId;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Group Settings')),
+      appBar: AppBar(title: Text('Group Settings')),
       body: group == null
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(child: CircularProgressIndicator())
           : Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
                   TextField(
                     controller: _emailController,
-                    decoration: const InputDecoration(labelText: 'Email'),
+                    decoration: InputDecoration(labelText: 'Email'),
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: _inviteUser,
-                    child: const Text('Invite User'),
+                    child: Text('Invite User'),
                   ),
                   if (isAdmin) ...[
-                    const SizedBox(height: 20),
+                    SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: _showKickUserDialog,
-                      child: const Text('Kick User'),
+                      child: Text('Kick User'),
                     ),
-                    const SizedBox(height: 20),
+                    SizedBox(height: 20),
                     ElevatedButton(
-                      onPressed: () {
-                        // Add delete group functionality
-                      },
-                      child: const Text('Delete Group'),
+                      onPressed: _showDeleteGroupDialog,
+                      child: Text('Delete Group'),
                     ),
-                    const SizedBox(height: 20),
+                    SizedBox(height: 20),
                     Expanded(
                       child: ListView.builder(
                         itemCount: members.length,
@@ -197,7 +242,7 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
                           return ListTile(
                             title: Text(member['user']['username']),
                             trailing: IconButton(
-                              icon: const Icon(Icons.remove_circle),
+                              icon: Icon(Icons.remove_circle),
                               onPressed: () => _kickUser(member['id']),
                             ),
                           );

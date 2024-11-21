@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import (
-    GroupListCreateView, GroupDetailView, GroupMembersView,
+    DeleteGroupView, GroupListCreateView, GroupDetailView, GroupMembersView,
     GroupMembershipListCreateView, GroupMembershipDetailView,
     EventListCreateView, EventDetailView, EventCreateView, InviteUserView, AcceptInvitationView, KickUserView, RejectInvitationView, ListInvitationsView
 )
@@ -8,6 +8,7 @@ from .views import (
 urlpatterns = [
     path('', GroupListCreateView.as_view(), name='group-list-create'),
     path('<int:pk>/', GroupDetailView.as_view(), name='group-detail'),
+    path('<int:pk>/delete/', DeleteGroupView.as_view(), name='delete-group'),
     path('memberships/', GroupMembershipListCreateView.as_view(), name='membership-list-create'),
     path('memberships/<int:pk>/', GroupMembershipDetailView.as_view(), name='membership-detail'),
     path('events/', EventListCreateView.as_view(), name='event-list-create'),

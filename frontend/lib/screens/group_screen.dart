@@ -75,8 +75,8 @@ class _GroupScreenState extends State<GroupScreen> {
             title: Text(groups[index]['name']),
             trailing: IconButton(
               icon: const Icon(Icons.settings),
-              onPressed: () {
-                Navigator.push(
+              onPressed: () async {
+                final result = await Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => GroupSettingsScreen(
@@ -85,6 +85,9 @@ class _GroupScreenState extends State<GroupScreen> {
                     ),
                   ),
                 );
+                if (result == true) {
+                  fetchGroups(); // Refresh groups if a group was deleted
+                }
               },
             ),
             onTap: () {
