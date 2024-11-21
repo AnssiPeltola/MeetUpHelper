@@ -67,7 +67,6 @@ class _InvitationsScreenState extends State<InvitationsScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Invitation rejected')),
         );
-        Navigator.pop(context, true);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Failed to reject invitation')),
