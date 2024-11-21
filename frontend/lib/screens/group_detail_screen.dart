@@ -7,7 +7,8 @@ class GroupDetailScreen extends StatefulWidget {
   final String token;
   final int groupId;
 
-  GroupDetailScreen({required this.token, required this.groupId});
+  const GroupDetailScreen(
+      {super.key, required this.token, required this.groupId});
 
   @override
   _GroupDetailScreenState createState() => _GroupDetailScreenState();
@@ -47,7 +48,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
         title: Text(group?['name'] ?? 'Group Details'),
         actions: [
           IconButton(
-            icon: Icon(Icons.add),
+            icon: const Icon(Icons.add),
             onPressed: () {
               Navigator.push(
                 context,
@@ -63,7 +64,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
         ],
       ),
       body: group == null
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : Column(
               children: [
                 Padding(
@@ -74,7 +75,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                   child: SfCalendar(
                     view: CalendarView.month,
                     dataSource: EventDataSource(events),
-                    monthViewSettings: MonthViewSettings(
+                    monthViewSettings: const MonthViewSettings(
                       appointmentDisplayMode:
                           MonthAppointmentDisplayMode.appointment,
                     ),

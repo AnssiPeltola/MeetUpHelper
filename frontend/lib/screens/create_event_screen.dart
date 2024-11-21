@@ -6,8 +6,7 @@ class CreateEventScreen extends StatefulWidget {
   final int groupId;
 
   const CreateEventScreen(
-      {Key? key, required this.token, required this.groupId})
-      : super(key: key);
+      {super.key, required this.token, required this.groupId});
 
   @override
   _CreateEventScreenState createState() => _CreateEventScreenState();

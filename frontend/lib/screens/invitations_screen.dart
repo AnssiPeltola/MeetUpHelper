@@ -4,7 +4,7 @@ import '../services/group_service.dart';
 class InvitationsScreen extends StatefulWidget {
   final String token;
 
-  const InvitationsScreen({Key? key, required this.token}) : super(key: key);
+  const InvitationsScreen({super.key, required this.token});
 
   @override
   _InvitationsScreenState createState() => _InvitationsScreenState();
@@ -27,11 +27,11 @@ class _InvitationsScreenState extends State<InvitationsScreen> {
       setState(() {
         invitations = fetchedInvitations;
       });
-      debugPrint('Fetched invitations: $invitations'); // Add logging here
+      debugPrint('Fetched invitations: $invitations');
     } catch (e) {
       // Handle error
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to load invitations')),
+        const SnackBar(content: Text('Failed to load invitations')),
       );
     }
   }
@@ -43,16 +43,17 @@ class _InvitationsScreenState extends State<InvitationsScreen> {
       if (success) {
         fetchInvitations();
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Invitation accepted')),
+          const SnackBar(content: Text('Invitation accepted')),
         );
+        Navigator.pop(context, true);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to accept invitation')),
+          const SnackBar(content: Text('Failed to accept invitation')),
         );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('An error occurred')),
+        const SnackBar(content: Text('An error occurred')),
       );
     }
   }
@@ -64,16 +65,16 @@ class _InvitationsScreenState extends State<InvitationsScreen> {
       if (success) {
         fetchInvitations();
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Invitation rejected')),
+          const SnackBar(content: Text('Invitation rejected')),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to reject invitation')),
+          const SnackBar(content: Text('Failed to reject invitation')),
         );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('An error occurred')),
+        const SnackBar(content: Text('An error occurred')),
       );
     }
   }
@@ -81,7 +82,7 @@ class _InvitationsScreenState extends State<InvitationsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Invitations')),
+      appBar: AppBar(title: const Text('Invitations')),
       body: ListView.builder(
         itemCount: invitations.length,
         itemBuilder: (context, index) {
@@ -96,11 +97,11 @@ class _InvitationsScreenState extends State<InvitationsScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 IconButton(
-                  icon: Icon(Icons.check),
+                  icon: const Icon(Icons.check),
                   onPressed: () => _acceptInvitation(invitation['id']),
                 ),
                 IconButton(
-                  icon: Icon(Icons.close),
+                  icon: const Icon(Icons.close),
                   onPressed: () => _rejectInvitation(invitation['id']),
                 ),
               ],
