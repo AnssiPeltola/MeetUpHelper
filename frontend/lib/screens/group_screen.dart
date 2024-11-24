@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
+import 'dart:convert';
+import 'package:web_socket_channel/web_socket_channel.dart';
+// import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../services/group_service.dart';
 import 'group_detail_screen.dart';
 import 'create_group_screen.dart';
 import 'group_settings_screen.dart';
 import 'invitations_screen.dart';
+import 'package:web_socket_channel/io.dart';
 
 class GroupScreen extends StatefulWidget {
   final String token;
@@ -18,12 +23,34 @@ class _GroupScreenState extends State<GroupScreen> {
   List<dynamic> groups = [];
   final GroupService _groupService = GroupService();
   int newInvitationsCount = 0;
+  late WebSocketChannel channel;
 
   @override
   void initState() {
     super.initState();
     fetchGroups();
     fetchNewInvitationsCount();
+    connectWebSocket();
+  }
+
+  @override
+  void dispose() {
+    channel.sink.close();
+    super.dispose();
+  }
+
+  void connectWebSocket() {
+    final uri = Uri.parse(
+        'ws://192.168.1.211:8000/ws/notifications/?token=${widget.token}'); // Include the token in the query string
+
+    channel = IOWebSocketChannel.connect(uri);
+
+    channel.stream.listen((message) {
+      final data = json.decode(message);
+      if (data['title'] == 'New Invitation') {
+        fetchNewInvitationsCount();
+      }
+    });
   }
 
   Future<void> fetchGroups() async {

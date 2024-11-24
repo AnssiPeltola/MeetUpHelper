@@ -7,6 +7,8 @@ from rest_framework.response import Response
 import logging
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 
 logger = logging.getLogger(__name__)
 
@@ -98,6 +100,17 @@ class InviteUserView(generics.CreateAPIView):
             invitation, created = GroupInvitation.objects.get_or_create(user=user, group=group)
             if not created:
                 return Response({'error': 'User already invited'}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Send notification
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                f"user_{user.id}",
+                {
+                    "type": "send_notification",
+                    "message": {"title": "New Invitation", "body": "You have a new group invitation."}
+                }
+            )
+
             return Response({'message': 'User invited successfully'}, status=status.HTTP_201_CREATED)
         except Group.DoesNotExist:
             return Response({'error': 'Group not found'}, status=status.HTTP_404_NOT_FOUND)
