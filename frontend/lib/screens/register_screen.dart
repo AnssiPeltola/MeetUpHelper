@@ -17,9 +17,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _password2Controller = TextEditingController();
 
   Future<void> _register() async {
+    final email = _emailController.text.toLowerCase();
+    final username = _usernameController.text.toLowerCase();
+
     final result = await _authService.registerUser(
-      _emailController.text,
-      _usernameController.text,
+      email,
+      username,
       _passwordController.text,
       _password2Controller.text,
     );
