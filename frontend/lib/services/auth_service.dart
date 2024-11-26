@@ -5,7 +5,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 class AuthService {
   final String baseUrl = dotenv.env['BASE_URL']!;
 
-  Future<bool> registerUser(
+  Future<Map<String, String>?> registerUser(
       String email, String username, String password, String password2) async {
     final response = await http.post(
       Uri.parse('$baseUrl/accounts/register/'),
@@ -17,7 +17,12 @@ class AuthService {
       },
     );
 
-    return response.statusCode == 201;
+    if (response.statusCode == 201) {
+      // Automatically log in the user after successful registration
+      return await loginUser(username, password);
+    } else {
+      return null;
+    }
   }
 
   Future<Map<String, String>?> loginUser(

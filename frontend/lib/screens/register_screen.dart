@@ -17,24 +17,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _password2Controller = TextEditingController();
 
   Future<void> _register() async {
-    bool success = await _authService.registerUser(
+    final result = await _authService.registerUser(
       _emailController.text,
       _usernameController.text,
       _passwordController.text,
       _password2Controller.text,
     );
 
-    if (success) {
+    if (result != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Registration successful!')),
       );
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-            builder: (context) => LoggedInScreen(
-                token: 'dummy_token',
-                username: _usernameController
-                    .text)), // Replace with actual token if needed
+          builder: (context) => LoggedInScreen(
+            username: result['username']!,
+            token: result['token']!,
+          ),
+        ),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
