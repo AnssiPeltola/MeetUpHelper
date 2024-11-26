@@ -9,6 +9,11 @@ class LoggedInScreen extends StatelessWidget {
   const LoggedInScreen(
       {super.key, required this.username, required this.token});
 
+  String _capitalizeFirstLetter(String text) {
+    if (text.isEmpty) return text;
+    return text[0].toUpperCase() + text.substring(1);
+  }
+
   @override
   Widget build(BuildContext context) {
     // Navigate to the group screen after 3 seconds with a fade transition
@@ -37,7 +42,7 @@ class LoggedInScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                'Welcome $username!',
+                'Welcome ${_capitalizeFirstLetter(username)}!',
                 style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,

@@ -15,8 +15,9 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
 
   Future<void> _login() async {
+    final username = _usernameController.text.toLowerCase();
     final result = await _authService.loginUser(
-      _usernameController.text,
+      username,
       _passwordController.text,
     );
 
@@ -28,7 +29,7 @@ class _LoginScreenState extends State<LoginScreen> {
         context,
         MaterialPageRoute(
           builder: (context) => LoggedInScreen(
-            username: result['username']!,
+            username: username,
             token: result['token']!,
           ),
         ),
