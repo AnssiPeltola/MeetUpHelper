@@ -242,6 +242,26 @@ class GroupService {
     }
   }
 
+  Future<String?> fetchCurrentUserRole(String token, int groupId) async {
+    final url = Uri.parse('$baseUrl/groups/$groupId/members/');
+    final response = await http.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      final member = data.firstWhere(
+          (member) => member['user']['id'] == currentUserId,
+          orElse: () => null);
+      return member != null ? member['role'] : null;
+    } else {
+      throw Exception('Failed to fetch current user role');
+    }
+  }
+
   Future<bool> deleteGroup(String token, int groupId) async {
     final url = Uri.parse('$baseUrl/groups/$groupId/delete/');
     final response = await http.delete(
@@ -274,6 +294,24 @@ class GroupService {
       return data['new_invitations_count'];
     } else {
       throw Exception('Failed to load new invitations count');
+    }
+  }
+
+  Future<bool> leaveGroup(String token, int groupId) async {
+    final url = Uri.parse('$baseUrl/groups/leave/');
+    final response = await http.post(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({'group_id': groupId}),
+    );
+
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      return false;
     }
   }
 }
