@@ -107,6 +107,7 @@ class InviteUserView(generics.CreateAPIView):
                 f"user_{user.id}",
                 {
                     "type": "send_notification",
+                    "title": "New Invitation",
                     "message": {"title": "New Invitation", "body": "You have a new group invitation."}
                 }
             )

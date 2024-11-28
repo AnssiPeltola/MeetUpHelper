@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/main.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:web_socket_channel/web_socket_channel.dart';
-// import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:web_socket_channel/io.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import '../services/group_service.dart';
 import 'group_detail_screen.dart';
 import 'create_group_screen.dart';
 import 'group_settings_screen.dart';
 import 'invitations_screen.dart';
-import 'package:web_socket_channel/io.dart';
 
 class GroupScreen extends StatefulWidget {
   final String token;
@@ -41,14 +42,46 @@ class _GroupScreenState extends State<GroupScreen> {
 
   void connectWebSocket() {
     final uri = Uri.parse(
-        'ws://192.168.1.211:8000/ws/notifications/?token=${widget.token}'); // Include the token in the query string
+        'ws://192.168.1.211:8000/ws/notifications/?token=${widget.token}');
 
     channel = IOWebSocketChannel.connect(uri);
 
-    channel.stream.listen((message) {
+    channel.stream.listen((message) async {
+      debugPrint("Received message: $message");
       final data = json.decode(message);
-      if (data['title'] == 'New Invitation') {
-        fetchNewInvitationsCount();
+      debugPrint('Received WebSocket message: $data');
+
+      if (data != null &&
+          data.containsKey('title') &&
+          data.containsKey('body')) {
+        // Check for "New Invitation" notification
+        if (data['title'] == 'New Invitation') {
+          fetchNewInvitationsCount(); // Update invitation count
+
+          // Show a local notification
+          const AndroidNotificationDetails androidPlatformChannelSpecifics =
+              AndroidNotificationDetails(
+            'group_invites_channel', // channelId
+            'Group Invites', // channelName
+            channelDescription:
+                'Notifications for group invites', // description
+            importance: Importance.max,
+            priority: Priority.high,
+            ticker: 'ticker',
+          );
+
+          const NotificationDetails platformChannelSpecifics =
+              NotificationDetails(android: androidPlatformChannelSpecifics);
+
+          await flutterLocalNotificationsPlugin.show(
+            0, // Notification ID
+            data['title'], // Notification title
+            data['body'], // Notification body
+            platformChannelSpecifics,
+          );
+        }
+      } else {
+        debugPrint('Received invalid WebSocket message: $data');
       }
     });
   }
