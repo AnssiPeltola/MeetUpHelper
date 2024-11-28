@@ -56,7 +56,7 @@ class GroupService {
 
     if (response.statusCode == 200) {
       final groupData = json.decode(response.body);
-      debugPrint('Fetched group data: $groupData'); // Add logging here
+      debugPrint('Fetched group data: $groupData');
       return groupData;
     } else {
       throw Exception('Failed to load group details');
@@ -74,7 +74,7 @@ class GroupService {
 
     if (response.statusCode == 200) {
       final membersData = json.decode(response.body);
-      debugPrint('Fetched group members: $membersData'); // Add logging here
+      debugPrint('Fetched group members: $membersData');
       return membersData;
     } else {
       throw Exception('Failed to load group members');
@@ -234,7 +234,7 @@ class GroupService {
 
     if (response.statusCode == 200) {
       final userData = json.decode(response.body);
-      debugPrint('Fetched current user data: $userData'); // Add logging here
+      debugPrint('Fetched current user data: $userData');
       currentUserId = userData['id'];
       debugPrint('Current user ID: $currentUserId');
     } else {
