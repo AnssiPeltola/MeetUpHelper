@@ -44,11 +44,16 @@ class DeleteGroupView(generics.DestroyAPIView):
 
     def delete(self, request, *args, **kwargs):
         group = self.get_object()
-        if group.created_by != request.user:
-            return Response({'error': 'Only the group admin can delete the group.'}, status=status.HTTP_403_FORBIDDEN)
+        try:
+            membership = GroupMembership.objects.get(user=request.user, group=group)
+            if membership.role != 'admin':
+                return Response({'error': 'Only the group admin can delete the group.'}, status=status.HTTP_403_FORBIDDEN)
+        except GroupMembership.DoesNotExist:
+            return Response({'error': 'You are not a member of this group.'}, status=status.HTTP_403_FORBIDDEN)
+
         group.delete()
         return Response({'message': 'Group deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
-    
+
 class KickUserView(generics.DestroyAPIView):
     queryset = GroupMembership.objects.all()
     serializer_class = GroupMembershipSerializer
@@ -56,8 +61,13 @@ class KickUserView(generics.DestroyAPIView):
     def delete(self, request, *args, **kwargs):
         membership = self.get_object()
         group = membership.group
-        if group.created_by != request.user:
-            return Response({'error': 'Only the group admin can kick users.'}, status=status.HTTP_403_FORBIDDEN)
+        try:
+            admin_membership = GroupMembership.objects.get(user=request.user, group=group)
+            if admin_membership.role != 'admin':
+                return Response({'error': 'Only the group admin can kick users.'}, status=status.HTTP_403_FORBIDDEN)
+        except GroupMembership.DoesNotExist:
+            return Response({'error': 'You are not a member of this group.'}, status=status.HTTP_403_FORBIDDEN)
+
         membership.delete()
         return Response({'message': 'User kicked from group.'}, status=status.HTTP_200_OK)
 
@@ -177,3 +187,37 @@ class NewInvitationsCountView(APIView):
         user = request.user
         new_invitations_count = GroupInvitation.objects.filter(user=user, accepted=False).count()
         return Response({'new_invitations_count': new_invitations_count})
+    
+class LeaveGroupView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        group_id = request.data.get('group_id')
+        user = request.user
+
+        try:
+            group = Group.objects.get(id=group_id)
+            membership = GroupMembership.objects.get(user=user, group=group)
+
+            if membership.role == 'admin':
+                # Find the oldest member to promote to admin
+                oldest_member = GroupMembership.objects.filter(group=group, role='member').order_by('joined_at').first()
+                if oldest_member:
+                    oldest_member.role = 'admin'
+                    oldest_member.save()
+                else:
+                    return Response({'error': 'Cannot leave the group as there are no other members to promote to admin.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Delete all events created by the user in this group
+            Event.objects.filter(group=group, created_by=user).delete()
+
+            # Delete the membership
+            membership.delete()
+
+            return Response({'message': 'Left the group successfully.'}, status=status.HTTP_200_OK)
+        except Group.DoesNotExist:
+            return Response({'error': 'Group not found.'}, status=status.HTTP_404_NOT_FOUND)
+        except GroupMembership.DoesNotExist:
+            return Response({'error': 'Membership not found.'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)

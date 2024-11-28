@@ -18,6 +18,7 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
   final GroupService _groupService = GroupService();
   Map<String, dynamic>? group;
   List<dynamic> members = [];
+  String? currentUserRole;
 
   @override
   void initState() {
@@ -29,6 +30,7 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
     try {
       await _groupService.fetchCurrentUser(widget.token);
       await fetchGroupDetails();
+      await fetchCurrentUserRole();
     } catch (e) {
       debugPrint('Error fetching current user and group details: $e');
     }
@@ -46,6 +48,18 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
       });
     } catch (e) {
       debugPrint('Error fetching group details: $e');
+    }
+  }
+
+  Future<void> fetchCurrentUserRole() async {
+    try {
+      final role = await _groupService.fetchCurrentUserRole(
+          widget.token, widget.groupId);
+      setState(() {
+        currentUserRole = role;
+      });
+    } catch (e) {
+      debugPrint('Error fetching current user role: $e');
     }
   }
 
@@ -101,6 +115,24 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
     }
   }
 
+  Future<void> _leaveGroup() async {
+    try {
+      final success =
+          await _groupService.leaveGroup(widget.token, widget.groupId);
+      if (success) {
+        Navigator.of(context).pop(true);
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Left the group successfully')));
+      } else {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Failed to leave group')));
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('An error occurred')));
+    }
+  }
+
   void _showDeleteGroupDialog() {
     showDialog(
       context: context,
@@ -122,6 +154,34 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
                 _deleteGroup();
               },
               child: Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showLeaveGroupDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Leave Group'),
+          content: Text(
+              'Are you sure you want to leave this group? This action cannot be undone.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _leaveGroup();
+              },
+              child: Text('Leave'),
             ),
           ],
         );
@@ -203,7 +263,7 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isAdmin = group?['created_by']['id'] == _groupService.currentUserId;
+    final isAdmin = currentUserRole == 'admin';
 
     return Scaffold(
       appBar: AppBar(title: Text('Group Settings')),
@@ -233,23 +293,28 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
                       onPressed: _showDeleteGroupDialog,
                       child: Text('Delete Group'),
                     ),
-                    SizedBox(height: 20),
-                    Expanded(
-                      child: ListView.builder(
-                        itemCount: members.length,
-                        itemBuilder: (context, index) {
-                          final member = members[index];
-                          return ListTile(
-                            title: Text(member['user']['username']),
-                            trailing: IconButton(
-                              icon: Icon(Icons.remove_circle),
-                              onPressed: () => _kickUser(member['id']),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
                   ],
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: _showLeaveGroupDialog,
+                    child: Text('Leave Group'),
+                  ),
+                  SizedBox(height: 20),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: members.length,
+                      itemBuilder: (context, index) {
+                        final member = members[index];
+                        return ListTile(
+                          title: Text(member['user']['username']),
+                          trailing: IconButton(
+                            icon: Icon(Icons.remove_circle),
+                            onPressed: () => _kickUser(member['id']),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
                 ],
               ),
             ),
