@@ -92,6 +92,13 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                       final pickedTime = await showTimePicker(
                         context: context,
                         initialTime: TimeOfDay.fromDateTime(_startTime),
+                        builder: (BuildContext context, Widget? child) {
+                          return MediaQuery(
+                            data: MediaQuery.of(context)
+                                .copyWith(alwaysUse24HourFormat: true),
+                            child: child!,
+                          );
+                        },
                       );
                       if (pickedTime != null) {
                         setState(() {
@@ -126,6 +133,13 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                       final pickedTime = await showTimePicker(
                         context: context,
                         initialTime: TimeOfDay.fromDateTime(_endTime),
+                        builder: (BuildContext context, Widget? child) {
+                          return MediaQuery(
+                            data: MediaQuery.of(context)
+                                .copyWith(alwaysUse24HourFormat: true),
+                            child: child!,
+                          );
+                        },
                       );
                       if (pickedTime != null) {
                         setState(() {
