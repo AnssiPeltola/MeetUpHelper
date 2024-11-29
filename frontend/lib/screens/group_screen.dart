@@ -171,41 +171,47 @@ class _GroupScreenState extends State<GroupScreen> {
           ),
         ],
       ),
-      body: ListView.builder(
-        itemCount: groups.length,
-        itemBuilder: (context, index) {
-          return ListTile(
-            title: Text(groups[index]['name']),
-            trailing: IconButton(
-              icon: const Icon(Icons.settings),
-              onPressed: () async {
-                final result = await Navigator.push(
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await fetchGroups();
+          await fetchNewInvitationsCount();
+        },
+        child: ListView.builder(
+          itemCount: groups.length,
+          itemBuilder: (context, index) {
+            return ListTile(
+              title: Text(groups[index]['name']),
+              trailing: IconButton(
+                icon: const Icon(Icons.settings),
+                onPressed: () async {
+                  final result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => GroupSettingsScreen(
+                        token: widget.token,
+                        groupId: groups[index]['id'],
+                      ),
+                    ),
+                  );
+                  if (result == true) {
+                    fetchGroups(); // Refresh groups if a group was deleted
+                  }
+                },
+              ),
+              onTap: () {
+                Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => GroupSettingsScreen(
+                    builder: (context) => GroupDetailScreen(
                       token: widget.token,
                       groupId: groups[index]['id'],
                     ),
                   ),
                 );
-                if (result == true) {
-                  fetchGroups(); // Refresh groups if a group was deleted
-                }
               },
-            ),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => GroupDetailScreen(
-                    token: widget.token,
-                    groupId: groups[index]['id'],
-                  ),
-                ),
-              );
-            },
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
