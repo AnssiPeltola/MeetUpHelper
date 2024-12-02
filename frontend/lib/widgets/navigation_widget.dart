@@ -4,16 +4,24 @@ import '../screens/invitations_screen.dart';
 
 class NavigationWidget extends StatefulWidget {
   final String token;
+  final int initialIndex;
 
-  const NavigationWidget({super.key, required this.token});
+  const NavigationWidget(
+      {super.key, required this.token, this.initialIndex = 0});
 
   @override
   _NavigationWidgetState createState() => _NavigationWidgetState();
 }
 
 class _NavigationWidgetState extends State<NavigationWidget> {
-  int _selectedIndex = 0;
+  late int _selectedIndex;
   int newInvitationsCount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedIndex = widget.initialIndex;
+  }
 
   void _onItemTapped(int index) {
     setState(() {

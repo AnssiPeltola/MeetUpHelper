@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/group_service.dart';
+import '../widgets/top_navbar.dart';
 
 class InvitationsScreen extends StatefulWidget {
   final String token;
@@ -91,7 +92,11 @@ class _InvitationsScreenState extends State<InvitationsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Invitations')),
+      appBar: TopNavBar(
+        token: widget.token,
+        title: 'Invitations',
+        automaticallyImplyLeading: false,
+      ),
       body: ListView.builder(
         itemCount: invitations.length,
         itemBuilder: (context, index) {
