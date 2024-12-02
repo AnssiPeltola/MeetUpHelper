@@ -9,6 +9,7 @@ import '../services/group_service.dart';
 import 'group_detail_screen.dart';
 import 'create_group_screen.dart';
 import 'group_settings_screen.dart';
+import '../widgets/top_navbar.dart';
 
 class GroupScreen extends StatefulWidget {
   final String token;
@@ -113,8 +114,10 @@ class _GroupScreenState extends State<GroupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Groups'),
+      appBar: TopNavBar(
+        token: widget.token,
+        title: 'Groups',
+        automaticallyImplyLeading: false,
       ),
       body: Column(
         children: [

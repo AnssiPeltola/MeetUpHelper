@@ -34,7 +34,9 @@ class LoggedInScreen extends StatelessWidget {
     });
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Logged In')),
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+      ),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
