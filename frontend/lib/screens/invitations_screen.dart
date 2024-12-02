@@ -3,8 +3,10 @@ import '../services/group_service.dart';
 
 class InvitationsScreen extends StatefulWidget {
   final String token;
+  final Function(int) updateInvitationCount;
 
-  const InvitationsScreen({super.key, required this.token});
+  const InvitationsScreen(
+      {super.key, required this.token, required this.updateInvitationCount});
 
   @override
   _InvitationsScreenState createState() => _InvitationsScreenState();
@@ -41,11 +43,14 @@ class _InvitationsScreenState extends State<InvitationsScreen> {
       final success =
           await _groupService.acceptInvitation(widget.token, invitationId);
       if (success) {
-        fetchInvitations();
+        setState(() {
+          invitations
+              .removeWhere((invitation) => invitation['id'] == invitationId);
+        });
+        widget.updateInvitationCount(invitations.length);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Invitation accepted')),
         );
-        Navigator.pop(context, true);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Failed to accept invitation')),
@@ -63,11 +68,14 @@ class _InvitationsScreenState extends State<InvitationsScreen> {
       final success =
           await _groupService.rejectInvitation(widget.token, invitationId);
       if (success) {
-        fetchInvitations();
+        setState(() {
+          invitations
+              .removeWhere((invitation) => invitation['id'] == invitationId);
+        });
+        widget.updateInvitationCount(invitations.length);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Invitation rejected')),
         );
-        Navigator.pop(context, true);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Failed to reject invitation')),
