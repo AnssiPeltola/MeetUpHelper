@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import '../services/group_service.dart';
 import 'create_event_screen.dart';
+import 'chat_screen.dart';
 
 class GroupDetailScreen extends StatefulWidget {
   final String token;
@@ -18,6 +19,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
   Map<String, dynamic>? group;
   List<dynamic> events = [];
   final GroupService _groupService = GroupService();
+  int _selectedIndex = 0;
 
   @override
   void initState() {
@@ -41,8 +43,35 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
     }
   }
 
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    List<Widget> _screens = [
+      Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text(group?['description'] ?? ''),
+          ),
+          Expanded(
+            child: SfCalendar(
+              view: CalendarView.month,
+              dataSource: EventDataSource(events),
+              monthViewSettings: const MonthViewSettings(
+                appointmentDisplayMode: MonthAppointmentDisplayMode.appointment,
+              ),
+            ),
+          ),
+        ],
+      ),
+      ChatScreen(token: widget.token),
+    ];
+
     return Scaffold(
       appBar: AppBar(
         title: Text(group?['name'] ?? 'Group Details'),
@@ -65,24 +94,21 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
       ),
       body: group == null
           ? const Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Text(group!['description'] ?? ''),
-                ),
-                Expanded(
-                  child: SfCalendar(
-                    view: CalendarView.month,
-                    dataSource: EventDataSource(events),
-                    monthViewSettings: const MonthViewSettings(
-                      appointmentDisplayMode:
-                          MonthAppointmentDisplayMode.appointment,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+          : _screens[_selectedIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.calendar_today),
+            label: 'Calendar',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.chat),
+            label: 'Chat',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+      ),
     );
   }
 }
