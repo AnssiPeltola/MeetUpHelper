@@ -3,6 +3,7 @@ import 'package:syncfusion_flutter_calendar/calendar.dart';
 import '../services/group_service.dart';
 import 'create_event_screen.dart';
 import 'chat_screen.dart';
+import 'group_settings_screen.dart';
 
 class GroupDetailScreen extends StatefulWidget {
   final String token;
@@ -54,10 +55,6 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
     List<Widget> _screens = [
       Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(group?['description'] ?? ''),
-          ),
           Expanded(
             child: SfCalendar(
               view: CalendarView.month,
@@ -65,6 +62,23 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
               monthViewSettings: const MonthViewSettings(
                 appointmentDisplayMode: MonthAppointmentDisplayMode.appointment,
               ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CreateEventScreen(
+                      token: widget.token,
+                      groupId: widget.groupId,
+                    ),
+                  ),
+                ).then((_) => fetchGroupDetails());
+              },
+              child: const Text('Make New Event'),
             ),
           ),
         ],
@@ -77,17 +91,17 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
         title: Text(group?['name'] ?? 'Group Details'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.add),
+            icon: const Icon(Icons.settings),
             onPressed: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => CreateEventScreen(
+                  builder: (context) => GroupSettingsScreen(
                     token: widget.token,
                     groupId: widget.groupId,
                   ),
                 ),
-              ).then((_) => fetchGroupDetails());
+              );
             },
           ),
         ],
