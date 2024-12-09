@@ -4,6 +4,7 @@ import '../services/group_service.dart';
 import 'create_event_screen.dart';
 import 'chat_screen.dart';
 import 'group_settings_screen.dart';
+import 'day_view_screen.dart';
 
 class GroupDetailScreen extends StatefulWidget {
   final String token;
@@ -62,6 +63,21 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
               monthViewSettings: const MonthViewSettings(
                 appointmentDisplayMode: MonthAppointmentDisplayMode.appointment,
               ),
+              onTap: (CalendarTapDetails details) {
+                if (details.targetElement == CalendarElement.calendarCell) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DayViewScreen(
+                        token: widget.token,
+                        groupId: widget.groupId,
+                        selectedDate: details.date!,
+                        events: events,
+                      ),
+                    ),
+                  );
+                }
+              },
             ),
           ),
           Padding(
