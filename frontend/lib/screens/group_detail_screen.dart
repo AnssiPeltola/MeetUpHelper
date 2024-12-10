@@ -22,27 +22,62 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
   List<dynamic> events = [];
   final GroupService _groupService = GroupService();
   int _selectedIndex = 0;
+  Map<int, Color> userColors = {};
 
   @override
   void initState() {
     super.initState();
     fetchGroupDetails();
+    fetchCurrentUser();
   }
 
   Future<void> fetchGroupDetails() async {
     try {
       final fetchedGroup =
           await _groupService.fetchGroupDetails(widget.token, widget.groupId);
+      final members =
+          await _groupService.fetchGroupMembers(widget.token, widget.groupId);
       debugPrint('Fetched group details: $fetchedGroup');
       setState(() {
         group = fetchedGroup;
         events = fetchedGroup['events'] ?? [];
+        userColors = _assignColorsToUsers(members);
+        debugPrint('User colors: $userColors');
         debugPrint('Fetched events: $events');
       });
     } catch (e) {
       // Handle error
       debugPrint('Error fetching group details: $e');
     }
+  }
+
+  Future<void> fetchCurrentUser() async {
+    try {
+      await _groupService.fetchCurrentUser(widget.token);
+      setState(() {
+        debugPrint('Current User ID: ${_groupService.currentUserId}');
+      });
+    } catch (e) {
+      // Handle error
+      debugPrint('Error fetching current user: $e');
+    }
+  }
+
+  Color generateColor(int index, int total) {
+    final hue = (index * 360 / total) % 360;
+    return HSLColor.fromAHSL(1.0, hue, 0.6, 0.5).toColor();
+  }
+
+  Map<int, Color> _assignColorsToUsers(List<dynamic> members) {
+    Map<int, Color> userColors = {};
+    int totalMembers = members.length;
+
+    for (int i = 0; i < members.length; i++) {
+      int userId = members[i]['user']['id'];
+      userColors[userId] = generateColor(i, totalMembers);
+    }
+
+    return userColors;
   }
 
   void _onItemTapped(int index) {
@@ -59,7 +94,8 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
           Expanded(
             child: SfCalendar(
               view: CalendarView.month,
-              dataSource: EventDataSource(events),
+              dataSource: EventDataSource(
+                  events, userColors, _groupService.currentUserId),
               monthViewSettings: const MonthViewSettings(
                 appointmentDisplayMode: MonthAppointmentDisplayMode.appointment,
               ),
@@ -144,7 +180,10 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
 }
 
 class EventDataSource extends CalendarDataSource {
-  EventDataSource(List<dynamic> source) {
+  final Map<int, Color> userColors;
+  final int? currentUserId;
+
+  EventDataSource(List<dynamic> source, this.userColors, this.currentUserId) {
     appointments = source;
   }
 
@@ -165,7 +204,16 @@ class EventDataSource extends CalendarDataSource {
 
   @override
   Color getColor(int index) {
-    return Colors.blue;
+    int? userId = appointments![index]['created_by'];
+    debugPrint(
+        'Event index: $index, User ID: $userId, Current User ID: $currentUserId');
+    if (userId == null) {
+      return Colors.grey;
+    }
+    if (userId == currentUserId) {
+      return Colors.blue;
+    }
+    return userColors[userId] ?? Colors.grey;
   }
 
   @override
