@@ -25,8 +25,7 @@ class _InvitationsScreenState extends State<InvitationsScreen> {
 
   Future<void> fetchInvitations() async {
     try {
-      final fetchedInvitations =
-          await _groupService.fetchInvitations(widget.token);
+      final fetchedInvitations = await _groupService.fetchInvitations();
       setState(() {
         invitations = fetchedInvitations;
       });
@@ -41,8 +40,7 @@ class _InvitationsScreenState extends State<InvitationsScreen> {
 
   Future<void> _acceptInvitation(int invitationId) async {
     try {
-      final success =
-          await _groupService.acceptInvitation(widget.token, invitationId);
+      final success = await _groupService.acceptInvitation(invitationId);
       if (success) {
         setState(() {
           invitations
@@ -66,8 +64,7 @@ class _InvitationsScreenState extends State<InvitationsScreen> {
 
   Future<void> _rejectInvitation(int invitationId) async {
     try {
-      final success =
-          await _groupService.rejectInvitation(widget.token, invitationId);
+      final success = await _groupService.rejectInvitation(invitationId);
       if (success) {
         setState(() {
           invitations

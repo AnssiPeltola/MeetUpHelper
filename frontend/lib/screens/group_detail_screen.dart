@@ -34,9 +34,8 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
   Future<void> fetchGroupDetails() async {
     try {
       final fetchedGroup =
-          await _groupService.fetchGroupDetails(widget.token, widget.groupId);
-      final members =
-          await _groupService.fetchGroupMembers(widget.token, widget.groupId);
+          await _groupService.fetchGroupDetails(widget.groupId);
+      final members = await _groupService.fetchGroupMembers(widget.groupId);
       debugPrint('Fetched group details: $fetchedGroup');
       setState(() {
         group = fetchedGroup;
@@ -53,7 +52,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
 
   Future<void> fetchCurrentUser() async {
     try {
-      await _groupService.fetchCurrentUser(widget.token);
+      await _groupService.fetchCurrentUser();
       setState(() {
         debugPrint('Current User ID: ${_groupService.currentUserId}');
       });

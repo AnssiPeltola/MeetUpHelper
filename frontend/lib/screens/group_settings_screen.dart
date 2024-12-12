@@ -28,7 +28,7 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
 
   Future<void> fetchCurrentUserAndGroupDetails() async {
     try {
-      await _groupService.fetchCurrentUser(widget.token);
+      await _groupService.fetchCurrentUser();
       await fetchGroupDetails();
       await fetchCurrentUserRole();
     } catch (e) {
@@ -39,7 +39,7 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
   Future<void> fetchGroupDetails() async {
     try {
       final fetchedGroup =
-          await _groupService.fetchGroupDetails(widget.token, widget.groupId);
+          await _groupService.fetchGroupDetails(widget.groupId);
       debugPrint('Fetched group details: $fetchedGroup');
       setState(() {
         group = fetchedGroup;
@@ -53,8 +53,7 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
 
   Future<void> fetchCurrentUserRole() async {
     try {
-      final role = await _groupService.fetchCurrentUserRole(
-          widget.token, widget.groupId);
+      final role = await _groupService.fetchCurrentUserRole(widget.groupId);
       setState(() {
         currentUserRole = role;
       });
@@ -65,8 +64,8 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
 
   Future<void> _inviteUser() async {
     try {
-      final success = await _groupService.inviteUser(
-          widget.token, widget.groupId, _emailController.text);
+      final success =
+          await _groupService.inviteUser(widget.groupId, _emailController.text);
       if (success) {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('User invited successfully')));
@@ -82,7 +81,7 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
 
   Future<void> _kickUser(int membershipId) async {
     try {
-      final success = await _groupService.kickUser(widget.token, membershipId);
+      final success = await _groupService.kickUser(membershipId);
       if (success) {
         fetchGroupDetails();
         ScaffoldMessenger.of(context)
@@ -99,8 +98,7 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
 
   Future<void> _deleteGroup() async {
     try {
-      final success =
-          await _groupService.deleteGroup(widget.token, widget.groupId);
+      final success = await _groupService.deleteGroup(widget.groupId);
       if (success) {
         Navigator.of(context).pop(true);
         ScaffoldMessenger.of(context).showSnackBar(
@@ -117,8 +115,7 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
 
   Future<void> _leaveGroup() async {
     try {
-      final success =
-          await _groupService.leaveGroup(widget.token, widget.groupId);
+      final success = await _groupService.leaveGroup(widget.groupId);
       if (success) {
         Navigator.of(context).pop(true);
         ScaffoldMessenger.of(context).showSnackBar(
@@ -190,8 +187,7 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
   }
 
   void _showKickUserDialog() async {
-    final members =
-        await _groupService.fetchGroupMembers(widget.token, widget.groupId);
+    final members = await _groupService.fetchGroupMembers(widget.groupId);
     final nonAdminMembers =
         members.where((member) => member['role'] != 'admin').toList();
     showDialog(

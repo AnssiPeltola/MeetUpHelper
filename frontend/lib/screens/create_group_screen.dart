@@ -17,7 +17,6 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
 
   Future<void> _createGroup() async {
     final success = await _groupService.createGroup(
-      widget.token,
       _nameController.text,
       _descriptionController.text,
     );
