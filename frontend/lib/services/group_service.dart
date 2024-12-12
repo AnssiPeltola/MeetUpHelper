@@ -2,18 +2,31 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/foundation.dart';
+import 'auth_service.dart';
 
 class GroupService {
   final String baseUrl = dotenv.env['BASE_URL']!;
   int? currentUserId;
+  final AuthService _authService = AuthService();
 
-  Future<List<dynamic>> fetchGroups(String token) async {
+  Future<List<dynamic>> fetchGroups() async {
+    final token = await _authService.getValidToken();
+    if (token == null) {
+      debugPrint('No valid token available');
+      throw Exception('No valid token available');
+    }
+
+    debugPrint('Using token: $token');
+
     final response = await http.get(
       Uri.parse('$baseUrl/groups/'),
       headers: {
         'Authorization': 'Bearer $token',
       },
     );
+
+    debugPrint('Response status: ${response.statusCode}');
+    debugPrint('Response body: ${response.body}');
 
     if (response.statusCode == 200) {
       return json.decode(response.body);
@@ -22,8 +35,12 @@ class GroupService {
     }
   }
 
-  Future<bool> createGroup(
-      String token, String name, String description) async {
+  Future<bool> createGroup(String name, String description) async {
+    final token = await _authService.getValidToken();
+    if (token == null) {
+      throw Exception('No valid token available');
+    }
+
     final response = await http.post(
       Uri.parse('$baseUrl/groups/'),
       headers: {
@@ -44,8 +61,13 @@ class GroupService {
     }
   }
 
-  Future<Map<String, dynamic>> fetchGroupDetails(
-      String token, int groupId) async {
+  Future<Map<String, dynamic>> fetchGroupDetails(int groupId) async {
+    final token = await _authService.getValidToken();
+    if (token == null) {
+      debugPrint('No valid token available');
+      throw Exception('No valid token available');
+    }
+
     final url = Uri.parse('$baseUrl/groups/$groupId/');
     final response = await http.get(
       url,
@@ -53,6 +75,9 @@ class GroupService {
         'Authorization': 'Bearer $token',
       },
     );
+
+    debugPrint('Response status: ${response.statusCode}');
+    debugPrint('Response body: ${response.body}');
 
     if (response.statusCode == 200) {
       final groupData = json.decode(response.body);
@@ -63,7 +88,13 @@ class GroupService {
     }
   }
 
-  Future<List<dynamic>> fetchGroupMembers(String token, int groupId) async {
+  Future<List<dynamic>> fetchGroupMembers(int groupId) async {
+    final token = await _authService.getValidToken();
+    if (token == null) {
+      debugPrint('No valid token available');
+      throw Exception('No valid token available');
+    }
+
     final url = Uri.parse('$baseUrl/groups/$groupId/members/');
     final response = await http.get(
       url,
@@ -71,6 +102,9 @@ class GroupService {
         'Authorization': 'Bearer $token',
       },
     );
+
+    debugPrint('Response status: ${response.statusCode}');
+    debugPrint('Response body: ${response.body}');
 
     if (response.statusCode == 200) {
       final membersData = json.decode(response.body);
@@ -81,13 +115,22 @@ class GroupService {
     }
   }
 
-  Future<List<dynamic>> fetchGroupEvents(String token, int groupId) async {
+  Future<List<dynamic>> fetchGroupEvents(int groupId) async {
+    final token = await _authService.getValidToken();
+    if (token == null) {
+      debugPrint('No valid token available');
+      throw Exception('No valid token available');
+    }
+
     final response = await http.get(
       Uri.parse('$baseUrl/groups/$groupId/events/'),
       headers: {
         'Authorization': 'Bearer $token',
       },
     );
+
+    debugPrint('Response status: ${response.statusCode}');
+    debugPrint('Response body: ${response.body}');
 
     if (response.statusCode == 200) {
       return json.decode(response.body);
@@ -96,13 +139,19 @@ class GroupService {
     }
   }
 
-  Future<bool> createEvent(String token, int groupId, String title,
-      String description, DateTime startTime, DateTime endTime) async {
-    final url = Uri.parse('$baseUrl/groups/events/create/');
+  Future<bool> createEvent(int groupId, String title, String description,
+      DateTime startTime, DateTime endTime) async {
+    final token = await _authService.getValidToken();
+    if (token == null) {
+      throw Exception('No valid token available');
+    }
+
+    final url = '$baseUrl/groups/events/create/';
     debugPrint(
         'Sending POST request to $url with data: {group: $groupId, title: $title, description: $description, start_time: ${startTime.toIso8601String()}, end_time: ${endTime.toIso8601String()}}');
+
     final response = await http.post(
-      url,
+      Uri.parse(url),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
@@ -125,7 +174,12 @@ class GroupService {
     }
   }
 
-  Future<bool> inviteUser(String token, int groupId, String email) async {
+  Future<bool> inviteUser(int groupId, String email) async {
+    final token = await _authService.getValidToken();
+    if (token == null) {
+      throw Exception('No valid token available');
+    }
+
     final url = Uri.parse('$baseUrl/groups/invite/');
     debugPrint(
         'Sending POST request to $url with data: {group_id: $groupId, email: $email}');
@@ -150,7 +204,12 @@ class GroupService {
     }
   }
 
-  Future<List<dynamic>> fetchInvitations(String token) async {
+  Future<List<dynamic>> fetchInvitations() async {
+    final token = await _authService.getValidToken();
+    if (token == null) {
+      throw Exception('No valid token available');
+    }
+
     final response = await http.get(
       Uri.parse('$baseUrl/groups/invitations/'),
       headers: {
@@ -165,7 +224,12 @@ class GroupService {
     }
   }
 
-  Future<bool> acceptInvitation(String token, int invitationId) async {
+  Future<bool> acceptInvitation(int invitationId) async {
+    final token = await _authService.getValidToken();
+    if (token == null) {
+      throw Exception('No valid token available');
+    }
+
     final response = await http.post(
       Uri.parse('$baseUrl/groups/invite/accept/'),
       headers: {
@@ -185,7 +249,12 @@ class GroupService {
     }
   }
 
-  Future<bool> rejectInvitation(String token, int invitationId) async {
+  Future<bool> rejectInvitation(int invitationId) async {
+    final token = await _authService.getValidToken();
+    if (token == null) {
+      throw Exception('No valid token available');
+    }
+
     final response = await http.post(
       Uri.parse('$baseUrl/groups/invite/reject/'),
       headers: {
@@ -205,7 +274,12 @@ class GroupService {
     }
   }
 
-  Future<bool> kickUser(String token, int membershipId) async {
+  Future<bool> kickUser(int membershipId) async {
+    final token = await _authService.getValidToken();
+    if (token == null) {
+      throw Exception('No valid token available');
+    }
+
     final url = Uri.parse('$baseUrl/groups/kick/$membershipId/');
     final response = await http.delete(
       url,
@@ -223,7 +297,12 @@ class GroupService {
     }
   }
 
-  Future<void> fetchCurrentUser(String token) async {
+  Future<void> fetchCurrentUser() async {
+    final token = await _authService.getValidToken();
+    if (token == null) {
+      throw Exception('No valid token available');
+    }
+
     final url = Uri.parse('$baseUrl/accounts/me/');
     final response = await http.get(
       url,
@@ -242,7 +321,12 @@ class GroupService {
     }
   }
 
-  Future<String?> fetchCurrentUserRole(String token, int groupId) async {
+  Future<String?> fetchCurrentUserRole(int groupId) async {
+    final token = await _authService.getValidToken();
+    if (token == null) {
+      throw Exception('No valid token available');
+    }
+
     final url = Uri.parse('$baseUrl/groups/$groupId/members/');
     final response = await http.get(
       url,
@@ -262,7 +346,12 @@ class GroupService {
     }
   }
 
-  Future<bool> deleteGroup(String token, int groupId) async {
+  Future<bool> deleteGroup(int groupId) async {
+    final token = await _authService.getValidToken();
+    if (token == null) {
+      throw Exception('No valid token available');
+    }
+
     final url = Uri.parse('$baseUrl/groups/$groupId/delete/');
     final response = await http.delete(
       url,
@@ -280,7 +369,12 @@ class GroupService {
     }
   }
 
-  Future<int> fetchNewInvitationsCount(String token) async {
+  Future<int> fetchNewInvitationsCount() async {
+    final token = await _authService.getValidToken();
+    if (token == null) {
+      throw Exception('No valid token available');
+    }
+
     final url = Uri.parse('$baseUrl/groups/invitations/count/');
     final response = await http.get(
       url,
@@ -297,7 +391,12 @@ class GroupService {
     }
   }
 
-  Future<bool> leaveGroup(String token, int groupId) async {
+  Future<bool> leaveGroup(int groupId) async {
+    final token = await _authService.getValidToken();
+    if (token == null) {
+      throw Exception('No valid token available');
+    }
+
     final url = Uri.parse('$baseUrl/groups/leave/');
     final response = await http.post(
       url,
@@ -315,7 +414,12 @@ class GroupService {
     }
   }
 
-  Future<String?> fetchCreatorUsername(String token, int userId) async {
+  Future<String?> fetchCreatorUsername(int userId) async {
+    final token = await _authService.getValidToken();
+    if (token == null) {
+      throw Exception('No valid token available');
+    }
+
     final url = Uri.parse('$baseUrl/accounts/user/$userId/');
     final response = await http.get(
       url,

@@ -90,23 +90,25 @@ class _GroupScreenState extends State<GroupScreen> {
 
   Future<void> fetchGroups() async {
     try {
-      final fetchedGroups = await _groupService.fetchGroups(widget.token);
+      final fetchedGroups = await _groupService.fetchGroups();
       setState(() {
         groups = fetchedGroups;
       });
     } catch (e) {
+      debugPrint('Error fetching groups: $e');
       // Handle error
     }
   }
 
   Future<void> fetchNewInvitationsCount() async {
     try {
-      final count = await _groupService.fetchNewInvitationsCount(widget.token);
+      final count = await _groupService.fetchNewInvitationsCount();
       setState(() {
         newInvitationsCount = count;
         widget.updateInvitationCount(count);
       });
     } catch (e) {
+      debugPrint('Error fetching invitations count: $e');
       // Handle error
     }
   }

@@ -22,7 +22,6 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   Future<void> _createEvent() async {
     try {
       final success = await _groupService.createEvent(
-        widget.token,
         widget.groupId,
         _titleController.text,
         _descriptionController.text,

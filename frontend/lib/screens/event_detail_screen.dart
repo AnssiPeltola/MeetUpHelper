@@ -25,8 +25,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
 
   Future<void> fetchCreatorUsername() async {
     try {
-      final username = await _groupService.fetchCreatorUsername(
-          widget.token, widget.event['created_by']);
+      final username =
+          await _groupService.fetchCreatorUsername(widget.event['created_by']);
       setState(() {
         creatorUsername = username;
       });
