@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../screens/group_screen.dart';
 import '../screens/invitations_screen.dart';
+import '../services/websocket_service.dart';
+import '../services/group_service.dart';
 
 class NavigationWidget extends StatefulWidget {
   final String token;
@@ -16,11 +18,23 @@ class NavigationWidget extends StatefulWidget {
 class _NavigationWidgetState extends State<NavigationWidget> {
   late int _selectedIndex;
   int newInvitationsCount = 0;
+  late WebSocketService _webSocketService;
+  final GroupService _groupService = GroupService();
 
   @override
   void initState() {
     super.initState();
     _selectedIndex = widget.initialIndex;
+    _webSocketService = WebSocketService();
+    _webSocketService.connect();
+    _webSocketService.onNewInvitation = fetchNewInvitationsCount;
+    fetchNewInvitationsCount(); // Initial fetch
+  }
+
+  @override
+  void dispose() {
+    _webSocketService.disconnect();
+    super.dispose();
   }
 
   void _onItemTapped(int index) {
@@ -35,11 +49,27 @@ class _NavigationWidgetState extends State<NavigationWidget> {
     });
   }
 
+  Future<void> fetchNewInvitationsCount() async {
+    try {
+      final count = await _groupService.fetchNewInvitationsCount();
+      if (mounted) {
+        setState(() {
+          newInvitationsCount = count;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error fetching invitations count: $e');
+      // Handle error
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     List<Widget> _screens = [
       GroupScreen(
-          token: widget.token, updateInvitationCount: updateInvitationCount),
+          token: widget.token,
+          webSocketService: _webSocketService,
+          updateInvitationCount: updateInvitationCount),
       InvitationsScreen(
           token: widget.token, updateInvitationCount: updateInvitationCount),
     ];
