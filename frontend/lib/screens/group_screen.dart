@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/main.dart';
 import 'dart:async';
-import 'dart:convert';
-import 'package:web_socket_channel/web_socket_channel.dart';
-import 'package:web_socket_channel/io.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import '../services/group_service.dart';
 import 'group_detail_screen.dart';
 import 'create_group_screen.dart';
 import 'group_settings_screen.dart';
 import '../widgets/top_navbar.dart';
+import '../services/websocket_service.dart';
 
 class GroupScreen extends StatefulWidget {
   final String token;
+  final WebSocketService webSocketService;
   final Function(int) updateInvitationCount;
 
   const GroupScreen(
-      {super.key, required this.token, required this.updateInvitationCount});
+      {super.key,
+      required this.token,
+      required this.webSocketService,
+      required this.updateInvitationCount});
 
   @override
   _GroupScreenState createState() => _GroupScreenState();
@@ -26,74 +26,29 @@ class _GroupScreenState extends State<GroupScreen> {
   List<dynamic> groups = [];
   final GroupService _groupService = GroupService();
   int newInvitationsCount = 0;
-  late WebSocketChannel channel;
 
   @override
   void initState() {
     super.initState();
     fetchGroups();
     fetchNewInvitationsCount();
-    connectWebSocket();
+    widget.webSocketService.onNewInvitation = fetchNewInvitationsCount;
   }
 
   @override
   void dispose() {
-    channel.sink.close();
+    widget.webSocketService.onNewInvitation = null;
     super.dispose();
-  }
-
-  void connectWebSocket() {
-    final uri = Uri.parse(
-        'ws://192.168.1.211:8000/ws/notifications/?token=${widget.token}');
-
-    channel = IOWebSocketChannel.connect(uri);
-
-    channel.stream.listen((message) async {
-      debugPrint("Received message: $message");
-      final data = json.decode(message);
-      debugPrint('Received WebSocket message: $data');
-
-      if (data != null &&
-          data.containsKey('title') &&
-          data.containsKey('body')) {
-        // Check for "New Invitation" notification
-        if (data['title'] == 'New Invitation') {
-          fetchNewInvitationsCount(); // Update invitation count
-
-          // Show a local notification
-          const AndroidNotificationDetails androidPlatformChannelSpecifics =
-              AndroidNotificationDetails(
-            'group_invites_channel', // channelId
-            'Group Invites', // channelName
-            channelDescription:
-                'Notifications for group invites', // description
-            importance: Importance.max,
-            priority: Priority.high,
-            ticker: 'ticker',
-          );
-
-          const NotificationDetails platformChannelSpecifics =
-              NotificationDetails(android: androidPlatformChannelSpecifics);
-
-          await flutterLocalNotificationsPlugin.show(
-            0, // Notification ID
-            data['title'], // Notification title
-            data['body'], // Notification body
-            platformChannelSpecifics,
-          );
-        }
-      } else {
-        debugPrint('Received invalid WebSocket message: $data');
-      }
-    });
   }
 
   Future<void> fetchGroups() async {
     try {
       final fetchedGroups = await _groupService.fetchGroups();
-      setState(() {
-        groups = fetchedGroups;
-      });
+      if (mounted) {
+        setState(() {
+          groups = fetchedGroups;
+        });
+      }
     } catch (e) {
       debugPrint('Error fetching groups: $e');
       // Handle error
@@ -103,10 +58,12 @@ class _GroupScreenState extends State<GroupScreen> {
   Future<void> fetchNewInvitationsCount() async {
     try {
       final count = await _groupService.fetchNewInvitationsCount();
-      setState(() {
-        newInvitationsCount = count;
-        widget.updateInvitationCount(count);
-      });
+      if (mounted) {
+        setState(() {
+          newInvitationsCount = count;
+          widget.updateInvitationCount(count);
+        });
+      }
     } catch (e) {
       debugPrint('Error fetching invitations count: $e');
       // Handle error
