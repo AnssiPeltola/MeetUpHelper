@@ -21,7 +21,9 @@ services:
 
   web:
     image: anssipeltola/meetuphelper:latest
-    command: daphne -p 8000 -b 0.0.0.0 backend.asgi:application
+    command: >
+      sh -c "python manage.py migrate &&
+             daphne -p 8000 -b 0.0.0.0 backend.asgi:application"
     volumes:
       - .:/app
     ports:
