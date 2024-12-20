@@ -435,4 +435,46 @@ class GroupService {
       throw Exception('Failed to fetch creator username');
     }
   }
+
+  Future<Map<String, dynamic>> fetchUserDetails(int userId) async {
+    final token = await _authService.getValidToken();
+    if (token == null) {
+      throw Exception('No valid token available');
+    }
+
+    final url = Uri.parse('$baseUrl/accounts/user/$userId/');
+    final response = await http.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to fetch user details');
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> fetchChatMessages(int groupId) async {
+    final token = await _authService.getValidToken();
+    if (token == null) {
+      throw Exception('No valid token available');
+    }
+
+    final url = Uri.parse('$baseUrl/groups/$groupId/chat/');
+    final response = await http.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return List<Map<String, dynamic>>.from(json.decode(response.body));
+    } else {
+      throw Exception('Failed to fetch chat messages');
+    }
+  }
 }

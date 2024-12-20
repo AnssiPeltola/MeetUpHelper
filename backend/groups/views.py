@@ -1,8 +1,8 @@
 from rest_framework import generics, status
-from .models import Group, GroupMembership, Event, GroupInvitation
+from .models import Group, GroupMembership, Event, GroupInvitation, ChatMessage
 from django.db import models
 from django.contrib.auth.models import User
-from .serializers import GroupSerializer, GroupMembershipSerializer, EventSerializer, GroupInvitationSerializer
+from .serializers import GroupSerializer, GroupMembershipSerializer, EventSerializer, GroupInvitationSerializer, ChatMessageSerializer
 from rest_framework.response import Response
 import logging
 from rest_framework.permissions import IsAuthenticated
@@ -221,3 +221,11 @@ class LeaveGroupView(APIView):
             return Response({'error': 'Membership not found.'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+class ChatMessageListView(generics.ListAPIView):
+    serializer_class = ChatMessageSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        group_id = self.kwargs['group_id']
+        return ChatMessage.objects.filter(group_id=group_id).order_by('timestamp')
