@@ -134,7 +134,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
           ),
         ],
       ),
-      ChatScreen(token: widget.token),
+      ChatScreen(token: widget.token, groupId: widget.groupId),
     ];
 
     return Scaffold(

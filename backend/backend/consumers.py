@@ -72,7 +72,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             {
                 'type': 'chat_message',
                 'message': chat_message.message,
-                'user': chat_message.user.username,
+                'user': chat_message.user.id,  # Send user ID instead of username
                 'timestamp': chat_message.timestamp.isoformat(),
             }
         )
@@ -80,7 +80,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def chat_message(self, event):
         await self.send(text_data=json.dumps({
             'message': event['message'],
-            'user': event['user'],
+            'user': event['user'],  # Ensure user ID is sent
             'timestamp': event['timestamp'],
         }))
 

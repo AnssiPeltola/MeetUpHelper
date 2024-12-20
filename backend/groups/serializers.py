@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Group, GroupMembership, Event, GroupInvitation
+from .models import Group, GroupMembership, Event, GroupInvitation, ChatMessage
 from django.contrib.auth.models import User
 
 class UserSerializer(serializers.ModelSerializer):
@@ -40,3 +40,11 @@ class GroupInvitationSerializer(serializers.ModelSerializer):
     class Meta:
         model = GroupInvitation
         fields = '__all__'
+
+class ChatMessageSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
+    group = serializers.PrimaryKeyRelatedField(read_only=True)
+
+    class Meta:
+        model = ChatMessage
+        fields = ['id', 'group', 'user', 'message', 'timestamp']
