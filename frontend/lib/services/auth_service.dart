@@ -117,4 +117,24 @@ class AuthService {
         utf8.decode(base64Url.decode(base64Url.normalize(parts[1])));
     return json.decode(payload);
   }
+
+  int extractUserIdFromToken(String token) {
+    try {
+      final parts = token.split('.');
+      if (parts.length != 3) {
+        throw Exception('Invalid token');
+      }
+      final payload =
+          utf8.decode(base64Url.decode(base64Url.normalize(parts[1])));
+      final payloadMap = json.decode(payload);
+      if (payloadMap.containsKey('user_id')) {
+        return payloadMap['user_id'];
+      } else {
+        throw Exception('user_id not found in token');
+      }
+    } catch (e) {
+      debugPrint('Error extracting user ID from token: $e');
+      throw Exception('Failed to extract user ID from token');
+    }
+  }
 }

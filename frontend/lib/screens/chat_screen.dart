@@ -2,7 +2,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/io.dart';
+import 'package:intl/intl.dart';
 import '../services/group_service.dart';
+import '../services/auth_service.dart';
+import '../widgets/message_bubble.dart';
 
 class ChatScreen extends StatefulWidget {
   final String token;
@@ -19,12 +22,15 @@ class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
   final List<Map<String, dynamic>> _messages = [];
   final GroupService _groupService = GroupService();
+  final AuthService _authService = AuthService();
   final Map<int, String> _usernamesCache = {};
   final ScrollController _scrollController = ScrollController();
+  late int _currentUserId;
 
   @override
   void initState() {
     super.initState();
+    _currentUserId = _authService.extractUserIdFromToken(widget.token);
     _fetchChatMessages();
     _connectToChat();
   }
@@ -82,7 +88,9 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   String _formatTimestamp(String timestamp) {
-    return DateTime.parse(timestamp).toLocal().toString();
+    final dateTime = DateTime.parse(timestamp).toLocal();
+    final formatter = DateFormat('HH:mm');
+    return formatter.format(dateTime);
   }
 
   void _scrollToBottom() {
@@ -107,9 +115,6 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Chat'),
-      ),
       body: Column(
         children: [
           Expanded(
@@ -119,12 +124,13 @@ class _ChatScreenState extends State<ChatScreen> {
               itemBuilder: (context, index) {
                 final message = _messages[index];
                 final userId = message['user'];
+                final isMe = userId == _currentUserId;
                 if (userId is String) {
                   debugPrint('Error: userId is a String: $userId');
                   // Attempt to parse the userId as an integer
                   try {
                     final parsedUserId = int.parse(userId);
-                    return _buildMessageTile(message, parsedUserId);
+                    return _buildMessageTile(message, parsedUserId, isMe);
                   } catch (e) {
                     debugPrint('Failed to parse userId: $e');
                     return ListTile(
@@ -134,7 +140,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   }
                 } else if (userId is int) {
                   debugPrint('userId is an int: $userId');
-                  return _buildMessageTile(message, userId);
+                  return _buildMessageTile(message, userId, isMe);
                 } else {
                   debugPrint('Unexpected userId type: ${userId.runtimeType}');
                   return ListTile(
@@ -169,16 +175,18 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  Widget _buildMessageTile(Map<String, dynamic> message, int userId) {
+  Widget _buildMessageTile(
+      Map<String, dynamic> message, int userId, bool isMe) {
     return FutureBuilder<String>(
       future: _fetchUsername(userId),
       builder: (context, snapshot) {
         final username = snapshot.data ?? 'Loading...';
         final formattedTimestamp = _formatTimestamp(message['timestamp']);
-        return ListTile(
-          title: Text(username),
-          subtitle: Text(message['message']),
-          trailing: Text(formattedTimestamp),
+        return MessageBubble(
+          message: message['message'],
+          username: username,
+          timestamp: formattedTimestamp,
+          isMe: isMe,
         );
       },
     );
