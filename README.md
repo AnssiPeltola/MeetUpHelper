@@ -7,7 +7,7 @@ Work in progress!
 
 - **Create Calendar Groups**: Effortlessly create calendar groups and invite members to join.
 - **Add Events**: Enable all group members to contribute by adding their own events to the shared calendar.
-- **Group Chat (Coming Soon)**: Collaborate and plan meetups through an integrated group chat feature.
+- **Group Chat**: Collaborate and plan meetups through an integrated group chat feature.
 - **User Authentication**: Securely create accounts and log in with ease.
 - **JWT Authentication**: Ensure secure user access with token-based authentication.
 - **Real-time Notifications**: Stay updated with real-time notifications using WebSocket connections.
@@ -24,6 +24,6 @@ Work in progress!
 
 - **Framework**: Django
 - **Database**: PostgreSQL
-- **Real-time Communication**: Django Channels, Redis
+- **Real-time Communication**: Django Channels, Redis, WebSocket Connections
 - **API**: Django REST Framework
 - **Containerization**: Docker
