@@ -1,7 +1,7 @@
 # MeetUpHelper
 Work in progress!
 
-**MeetUpHelper** is a calendar group app designed to help you organize and manage events within groups. You can create calendar groups, invite people, and allow all group members to add their own events. Future plans include adding a group chat feature for planning meetups.
+**MeetUpHelper** is a calendar group app designed to help you organize and manage events within groups. You can create calendar groups, invite people, allow all group members to add their own events and a group chat feature for planning meetups.
 
 ## Features
 
