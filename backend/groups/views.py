@@ -18,7 +18,7 @@ class GroupListCreateView(generics.ListCreateAPIView):
     def get_queryset(self):
         user = self.request.user
         return Group.objects.filter(
-            models.Q(created_by=user) | models.Q(memberships__user=user)
+            memberships__user=user
         ).distinct()
 
     def perform_create(self, serializer):

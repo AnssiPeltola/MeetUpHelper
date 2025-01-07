@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/widgets/navigation_widget.dart';
 import '../services/group_service.dart';
 
 class GroupSettingsScreen extends StatefulWidget {
@@ -117,7 +118,15 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
     try {
       final success = await _groupService.leaveGroup(widget.groupId);
       if (success) {
-        Navigator.of(context).pop(true);
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (context) => NavigationWidget(
+              token: widget.token,
+              initialIndex: 0, // Ensure it navigates to the GroupScreen
+            ),
+          ),
+          (Route<dynamic> route) => false,
+        );
         ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Left the group successfully')));
       } else {
