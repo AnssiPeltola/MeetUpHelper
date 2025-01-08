@@ -266,6 +266,36 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
     );
   }
 
+  void _showInviteUserDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Invite User'),
+          content: TextField(
+            controller: _emailController,
+            decoration: InputDecoration(labelText: 'Email'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _inviteUser();
+              },
+              child: Text('Invite'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isAdmin = currentUserRole == 'admin';
@@ -278,13 +308,18 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
-                  TextField(
-                    controller: _emailController,
-                    decoration: InputDecoration(labelText: 'Email'),
-                  ),
+                  if (group != null) ...[
+                    Text(
+                      group!['name'],
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
                   SizedBox(height: 20),
                   ElevatedButton(
-                    onPressed: _inviteUser,
+                    onPressed: _showInviteUserDialog,
                     child: Text('Invite User'),
                   ),
                   if (isAdmin) ...[
