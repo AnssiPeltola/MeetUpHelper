@@ -29,7 +29,7 @@ class GroupService {
     debugPrint('Response body: ${response.body}');
 
     if (response.statusCode == 200) {
-      return json.decode(response.body);
+      return json.decode(utf8.decode(response.bodyBytes));
     } else {
       throw Exception('Failed to load groups');
     }
@@ -80,7 +80,7 @@ class GroupService {
     debugPrint('Response body: ${response.body}');
 
     if (response.statusCode == 200) {
-      final groupData = json.decode(response.body);
+      final groupData = json.decode(utf8.decode(response.bodyBytes));
       debugPrint('Fetched group data: $groupData');
       return groupData;
     } else {
@@ -429,7 +429,7 @@ class GroupService {
     );
 
     if (response.statusCode == 200) {
-      final data = json.decode(response.body);
+      final data = json.decode(utf8.decode(response.bodyBytes));
       return data['username'];
     } else {
       throw Exception('Failed to fetch creator username');
@@ -451,7 +451,7 @@ class GroupService {
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body);
+      return json.decode(utf8.decode(response.bodyBytes));
     } else {
       throw Exception('Failed to fetch user details');
     }
@@ -472,7 +472,8 @@ class GroupService {
     );
 
     if (response.statusCode == 200) {
-      return List<Map<String, dynamic>>.from(json.decode(response.body));
+      return List<Map<String, dynamic>>.from(
+          json.decode(utf8.decode(response.bodyBytes)));
     } else {
       throw Exception('Failed to fetch chat messages');
     }
