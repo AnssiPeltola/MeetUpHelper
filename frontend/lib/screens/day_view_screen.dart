@@ -17,11 +17,18 @@ class DayViewScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Ensure the selectedDate is at midnight for accurate comparisons
+    DateTime dayStart =
+        DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
+    DateTime dayEnd = dayStart
+        .add(const Duration(days: 1))
+        .subtract(const Duration(milliseconds: 1));
+
+    // Filter events that overlap the selectedDate
     List<dynamic> dayEvents = events.where((event) {
       DateTime startTime = DateTime.parse(event['start_time']);
       DateTime endTime = DateTime.parse(event['end_time']);
-      return selectedDate.isAfter(startTime.subtract(Duration(days: 1))) &&
-          selectedDate.isBefore(endTime.add(Duration(days: 1)));
+      return startTime.isBefore(dayEnd) && endTime.isAfter(dayStart);
     }).toList();
 
     return Scaffold(
